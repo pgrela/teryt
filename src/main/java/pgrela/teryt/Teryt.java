@@ -16,16 +16,22 @@ public class Teryt {
         ApplicationContext context = new AnnotationConfigApplicationContext(SpringContext.class);
         TerytDatabase terytDatabase = context.getBean(TerytDatabase.class);
 
-        String query = "80203022";
-        //query = "0936032";
         Scanner consoleInput = new Scanner(System.in);
+        System.out.println("Aby wyjść wpisz \"exit\"");
+        printHintLine();
+        String query;
         while (!"exit".equals(query = consoleInput.nextLine())) {
             try {
                 System.out.println(terytDatabase.query(query));
             } catch (TerytException e) {
                 LOG.warn(e);
             }
+            printHintLine();
         }
+    }
+
+    private static void printHintLine() {
+        System.out.print("Wpisz kod TERYT gminy lub miejscowości: ");
     }
 
     static String getTerytId(TeritorialUnit teritorialUnit) {

@@ -14,6 +14,7 @@ public class Town {
     private String name;
     private String type;
     private LocalDate validOn;
+    private String townIdentifier;
 
     public String getVoivodeship() {
         return voivodeship;
@@ -76,5 +77,15 @@ public class Town {
     @XmlElement(name = "STAN_NA")
     public void setValidOn(String validOn) {
         this.validOn = LocalDate.parse(validOn, DATE_TIME_FORMATTER);
+    }
+
+    public String getTownIdentifier() {
+        return townIdentifier;
+    }
+
+    @XmlElement(name = "SYM")
+    public Town setTownIdentifier(String townIdentifier) {
+        this.townIdentifier = townIdentifier;
+        return this;
     }
 }

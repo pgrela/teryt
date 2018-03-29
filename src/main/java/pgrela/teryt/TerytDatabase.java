@@ -1,11 +1,11 @@
 package pgrela.teryt;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 import javax.annotation.PostConstruct;
@@ -41,16 +41,17 @@ public class TerytDatabase {
     private Map<String, TeritorialUnit> teritorialUnitMap;
     private Map<String, List<Street>> streetsByTerritorialIdMap;
     private Map<String, List<Town>> townsByTerritorialIdMap;
+    private Map<String, Town> towns;
     private TownsPresenter townsPresenter;
     private StreetsPresenter streetsPresenter;
 
     @Autowired
     public TerytDatabase(
-            @Value("${teryt.territorialUnitsZipFile:/TERC_Urzedowy_2018-03-27.zip}") String territorialUnitsZipFile,
+            @Value("${teryt.territorialUnitsZipFile:src/main/resources/TERC_Urzedowy_2018-03-27.zip}") String territorialUnitsZipFile,
             @Value("${teryt.territorialUnitsFile:TERC_Urzedowy_2018-03-27.xml}") String territorialUnitsFile,
-            @Value("${teryt.streetsZipFile:/ULIC_Adresowy_2018-03-27.zip}") String streetsZipFile,
+            @Value("${teryt.streetsZipFile:src/main/resources/ULIC_Adresowy_2018-03-27.zip}") String streetsZipFile,
             @Value("${teryt.streetsFile:ULIC_Adresowy_2018-03-27.xml}") String streetsFile,
-            @Value("${teryt.townsZipFile:/SIMC_Adresowy_2018-03-28.zip}") String townsZipFile,
+            @Value("${teryt.townsZipFile:src/main/resources/SIMC_Adresowy_2018-03-28.zip}") String townsZipFile,
             @Value("${teryt.townsFile:SIMC_Adresowy_2018-03-28.xml}") String townsFile,
             TownsPresenter townsPresenter,
             StreetsPresenter streetsPresenter) {
@@ -86,6 +87,10 @@ public class TerytDatabase {
         townsByTerritorialIdMap = townRootXml.getCatalog().getTowns()
                 .stream()
                 .collect(Collectors.groupingBy(this::toMunicipalityId));
+        towns = townRootXml.getCatalog()
+                .getTowns()
+                .stream()
+                .collect(Collectors.toMap(Town::getTownIdentifier, Function.identity(), (a, b) -> b));
     }
 
     private String toMunicipalityId(Town town) {
@@ -143,15 +148,15 @@ public class TerytDatabase {
     }
 
     private ZipFile getZipFile(String zipFile) throws URISyntaxException, IOException {
-        File territorialUnitFile = new File(Teryt.class.getClass().getResource(zipFile).toURI());
-        return new ZipFile(territorialUnitFile);
+        return new ZipFile(zipFile);
     }
 
     public String query(String identifier) {
         if (isMunicipalityIdentifier(identifier)) {
-            return townsPresenter.presentAsString(townsByTerritorialIdMap.get(identifier));
+            return townsPresenter.presentAsString(townsByTerritorialIdMap.get(identifier),
+                    teritorialUnitMap.get(identifier));
         } else if (isCityIdentifier(identifier)) {
-            return streetsPresenter.presentAsString(streetsByTerritorialIdMap.get(identifier));
+            return streetsPresenter.presentAsString(streetsByTerritorialIdMap.get(identifier), towns.get(identifier));
         }
         throw new TerytException(String.format("Identifier %s is not valid", identifier));
     }
