@@ -3,6 +3,7 @@ package pgrela.teryt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -148,7 +149,7 @@ public class TerytDatabase {
     }
 
     private ZipFile getZipFile(String zipFile) throws URISyntaxException, IOException {
-        return new ZipFile(zipFile);
+        return new ZipFile(zipFile, Charset.forName("UTF-8"));
     }
 
     public String query(String identifier) {

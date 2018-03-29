@@ -8,3 +8,5 @@ To build code:
 To run app:
 
 `java -jar target/teryt-1.0-SNAPSHOT-jar-with-dependencies.jar`
+
+To exit the app type `exit`

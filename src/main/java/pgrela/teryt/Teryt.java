@@ -12,6 +12,7 @@ import pgrela.teryt.pojo.TeritorialUnit;
 
 public class Teryt {
     private static final Logger LOG = LogManager.getLogger(Teryt.class);
+
     public static void main(String[] args) {
         ApplicationContext context = new AnnotationConfigApplicationContext(SpringContext.class);
         TerytDatabase terytDatabase = context.getBean(TerytDatabase.class);
